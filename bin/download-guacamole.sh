@@ -1,3 +1,4 @@
+#!/bin/sh -e
 #
 # Copyright (C) 2015 Glyptodon LLC
 #
@@ -21,27 +22,22 @@
 #
 
 #
-# Dockerfile for guacamole-client
+# download-guacamole.sh: Downloads Guacamole, saving the specified version to "guacamole.war"
 #
 
-# Start from Tomcat image
-FROM tomcat:7.0-jre7
-MAINTAINER Michael Jumper <mike.jumper@guac-dev.org>
+VERSION="$1"
+DESTINATION="$2"
 
-# Version info
-ENV \
-    GUAC_VERSION=0.9.6      \
-    GUAC_JDBC_VERSION=0.9.6
+#
+# Create destination, if it does not yet exist
+#
 
-# Add configuration scripts
-COPY bin /opt/guac/bin/
+mkdir -p "$DESTINATION"
 
-# Download and install latest guacamole-client and authentication
-RUN \
-    /opt/guac/bin/download-guacamole.sh $GUAC_VERSION /usr/local/tomcat/webapps && \
-    /opt/guac/bin/download-jdbc-auth.sh $GUAC_JDBC_VERSION /opt/guac
+#
+# Download guacamole.war, placing in specified destination
+#
 
-# Start Guacamole under Tomcat, listening on 0.0.0.0:8080
-EXPOSE 8080
-CMD ["/opt/guac/bin/start.sh" ]
+echo "Downloading Guacamole version $VERSION to $DESTINATION ..."
+curl -L "http://sourceforge.net/projects/guacamole/files/current/binary/guacamole-${VERSION}.war" > "$DESTINATION/guacamole.war"
 
