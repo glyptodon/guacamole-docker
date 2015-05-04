@@ -87,7 +87,7 @@ END
     set_property "mysql-password" "$MYSQL_PASSWORD"
 
     # Add required .jar files to GUACAMOLE_LIB
-    ln -s /opt/guac/mysql/*.jar "$GUACAMOLE_LIB"
+    ln -s /opt/guacamole/mysql/*.jar "$GUACAMOLE_LIB"
 
 }
 
@@ -133,7 +133,7 @@ END
     set_property "postgresql-password" "$POSTGRES_PASSWORD"
 
     # Add required .jar files to GUACAMOLE_LIB
-    ln -s /opt/guac/postgresql/*.jar "$GUACAMOLE_LIB"
+    ln -s /opt/guacamole/postgresql/*.jar "$GUACAMOLE_LIB"
 
 }
 
@@ -172,7 +172,39 @@ set_property "guacd-port"     "$GUACD_PORT_4822_TCP_PORT"
 # Point to associated PostgreSQL
 #
 
-associate_postgresql
+# Only one database may be used
+if [ -n "$MYSQL_DATABASE" -a -n "$POSTGRES_DATABASE" ]; then
+    cat <<END
+FATAL: Both MySQL and PostgreSQL databases specified
+-------------------------------------------------------------------------------
+You have specified both the MYSQL_DATABASE and POSTGRES_DATABASE environment
+variables, but the Guacamole Docker container supports only one database.
+Please specify only MYSQL_DATABASE or POSTGRES_DATABASE, not both.
+END
+    exit 1;
+fi
+
+# At least one database must be given
+if [ -z "$MYSQL_DATABASE" -a -z "$POSTGRES_DATABASE" ]; then
+    cat <<END
+FATAL: No database specified
+-------------------------------------------------------------------------------
+The Guacamole Docker container needs an associated MySQL or PostgreSQL database
+in order to function. Please specify either the MYSQL_DATABASE or
+POSTGRES_DATABASE environment variables.
+END
+    exit 1;
+fi
+
+# Use MySQL if database specified
+if [ -n "$MYSQL_DATABASE" ]; then
+    associate_mysql
+fi
+
+# Use PostgreSQL if database specified
+if [ -n "$POSTGRES_DATABASE" ]; then
+    associate_postgresql
+fi
 
 #
 # Finally start Guacamole (under Tomcat)
