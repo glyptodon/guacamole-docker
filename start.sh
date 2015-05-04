@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 #
 # Copyright (C) 2015 Glyptodon LLC
 #
@@ -22,26 +22,50 @@
 #
 
 #
-# Guacamole configuration file generator
+# start.sh: Automatically configures and starts Guacamole
 #
 
-# Create Guacamole configuration directory
 GUACAMOLE_HOME="$HOME/.guacamole"
-mkdir -p "$GUACAMOLE_HOME"
-
-# Create initial guacamole.properties file
-GUACAMOLE_PROPERTIES="$GUACAMOLE_HOME/guacamole.properties"
-echo "# guacamole.properties - generated `date`" > "$GUACAMOLE_PROPERTIES"
-
-# Create Guacamole lib directory
 GUACAMOLE_LIB="$GUACAMOLE_HOME/lib"
+GUACAMOLE_PROPERTIES="$GUACAMOLE_HOME/guacamole.properties"
+
+set_property() {
+
+    NAME="$1"
+    VALUE="$2"
+
+    # Ensure guacamole.properties exists
+    if [ ! -e "$GUACAMOLE_PROPERTIES" ]; then
+        mkdir -p "$GUACAMOLE_HOME"
+        echo "# guacamole.properties - generated `date`" > "$GUACAMOLE_PROPERTIES"
+    fi
+
+    # Set property
+    echo "$NAME: $VALUE" >> "$GUACAMOLE_PROPERTIES"
+
+}
+
+start_guacamole() {
+    cd /usr/local/tomcat
+    exec catalina.sh run
+}
+
+#
+# Create and define Guacamole lib directory
+#
+
 mkdir -p "$GUACAMOLE_LIB"
-echo "lib-directory: $GUACAMOLE_LIB" >> "$GUACAMOLE_PROPERTIES"
+set_property "lib-directory" "$GUACAMOLE_LIB"
 
+#
 # Set auth provider
-echo "auth-provider: net.sourceforge.guacamole.net.basic.BasicFileAuthenticationProvider" >> "$GUACAMOLE_PROPERTIES"
+#
 
-# Start Tomcat
-cd /usr/local/tomcat
-exec catalina.sh run
+set_property "auth-provider" "net.sourceforge.guacamole.net.basic.BasicFileAuthenticationProvider"
+
+#
+# Finally start Guacamole (under Tomcat)
+#
+
+start_guacamole
 
