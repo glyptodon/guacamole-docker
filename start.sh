@@ -58,6 +58,25 @@ mkdir -p "$GUACAMOLE_LIB"
 set_property "lib-directory" "$GUACAMOLE_LIB"
 
 #
+# Point to associated guacd
+#
+
+# Verify required link is present
+if [ -z "$GUACD_PORT_4822_TCP_ADDR" -o -z "$GUACD_PORT_4822_TCP_PORT" ]; then
+    cat <<END
+FATAL: Missing "guacd" link.
+-------------------------------------------------------------------------------
+Every Guacamole instance needs a corresponding copy of guacd running. Link a
+container to the link named "guacd" to provide this.
+END
+    exit 1;
+fi
+
+# Update config file
+set_property "guacd-hostname" "$GUACD_PORT_4822_TCP_ADDR"
+set_property "guacd-port"     "$GUACD_PORT_4822_TCP_PORT"
+
+#
 # Set auth provider
 #
 
