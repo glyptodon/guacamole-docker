@@ -34,14 +34,14 @@ ENV \
     GUAC_JDBC_VERSION=0.9.6
 
 # Add configuration scripts
-COPY bin /opt/guac/bin/
+COPY bin /opt/guacamole/bin/
 
 # Download and install latest guacamole-client and authentication
 RUN \
-    /opt/guac/bin/download-guacamole.sh $GUAC_VERSION /usr/local/tomcat/webapps && \
-    /opt/guac/bin/download-jdbc-auth.sh $GUAC_JDBC_VERSION /opt/guac
+    /opt/guacamole/bin/download-guacamole.sh "$GUAC_VERSION" /usr/local/tomcat/webapps && \
+    /opt/guacamole/bin/download-jdbc-auth.sh "$GUAC_JDBC_VERSION" /opt/guacamole
 
 # Start Guacamole under Tomcat, listening on 0.0.0.0:8080
 EXPOSE 8080
-CMD ["/opt/guac/bin/start.sh" ]
+CMD ["/opt/guacamole/bin/start.sh" ]
 
