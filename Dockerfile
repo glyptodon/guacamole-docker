@@ -25,7 +25,7 @@
 #
 
 # Start from Tomcat image
-FROM tomcat:7.0-jre7
+FROM tomcat:8.0.20-jre7
 MAINTAINER Michael Jumper <mike.jumper@guac-dev.org>
 
 # Version info
