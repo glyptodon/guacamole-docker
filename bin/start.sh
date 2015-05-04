@@ -45,6 +45,52 @@ set_property() {
 
 }
 
+associate_postgresql() {
+
+    # Verify required link is present
+    if [ -z "$POSTGRES_PORT_5432_TCP_ADDR" -o -z "$POSTGRES_PORT_5432_TCP_PORT" ]; then
+        cat <<END
+FATAL: Missing "postgres" link.
+-------------------------------------------------------------------------------
+If using a PostgreSQL database, you must explicitly link the container
+providing that database with the link named "postgres".
+END
+        exit 1;
+    fi
+
+    # Verify required parameters are present
+    if [ -z "$POSTGRES_USER" -o -z "$POSTGRES_PASSWORD" -o -z "$POSTGRES_DATABASE" ]; then
+        cat <<END
+FATAL: Missing required environment variables
+-------------------------------------------------------------------------------
+If using a PostgreSQL database, you must provide each of the following
+environment variables:
+
+    POSTGRES_USER      The user to authenticate as when connecting to
+                       PostgreSQL.
+
+    POSTGRES_PASSWORD  The password to use when authenticating with PostgreSQL
+                       as POSTGRES_USER.
+
+    POSTGRES_DATABASE  The name of the PostgreSQL database to use for Guacamole
+                       authentication.
+END
+        exit 1;
+    fi
+
+    # Update config file
+    set_property "auth-provider" "org.glyptodon.guacamole.auth.postgresql.PostgreSQLAuthenticationProvider"
+    set_property "postgresql-hostname" "$POSTGRES_PORT_5432_TCP_ADDR"
+    set_property "postgresql-port"     "$POSTGRES_PORT_5432_TCP_PORT"
+    set_property "postgresql-database" "$POSTGRES_DATABASE"
+    set_property "postgresql-username" "$POSTGRES_USER"
+    set_property "postgresql-password" "$POSTGRES_PASSWORD"
+
+    # Add required .jar files to GUACAMOLE_LIB
+    ln -s /opt/guac/postgresql/*.jar "$GUACAMOLE_LIB"
+
+}
+
 start_guacamole() {
     cd /usr/local/tomcat
     exec catalina.sh run
@@ -77,10 +123,10 @@ set_property "guacd-hostname" "$GUACD_PORT_4822_TCP_ADDR"
 set_property "guacd-port"     "$GUACD_PORT_4822_TCP_PORT"
 
 #
-# Set auth provider
+# Point to associated PostgreSQL
 #
 
-set_property "auth-provider" "net.sourceforge.guacamole.net.basic.BasicFileAuthenticationProvider"
+associate_postgresql
 
 #
 # Finally start Guacamole (under Tomcat)
