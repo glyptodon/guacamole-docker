@@ -45,6 +45,52 @@ set_property() {
 
 }
 
+associate_mysql() {
+
+    # Verify required link is present
+    if [ -z "$MYSQL_PORT_3306_TCP_ADDR" -o -z "$MYSQL_PORT_3306_TCP_PORT" ]; then
+        cat <<END
+FATAL: Missing "mysql" link.
+-------------------------------------------------------------------------------
+If using a MySQL database, you must explicitly link the container providing
+that database with the link named "mysql".
+END
+        exit 1;
+    fi
+
+    # Verify required parameters are present
+    if [ -z "$MYSQL_USER" -o -z "$MYSQL_PASSWORD" -o -z "$MYSQL_DATABASE" ]; then
+        cat <<END
+FATAL: Missing required environment variables
+-------------------------------------------------------------------------------
+If using a MySQL database, you must provide each of the following
+environment variables:
+
+    MYSQL_USER         The user to authenticate as when connecting to
+                       MySQL.
+
+    MYSQL_PASSWORD     The password to use when authenticating with MySQL as
+                       MYSQL_USER.
+
+    MYSQL_DATABASE     The name of the MySQL database to use for Guacamole
+                       authentication.
+END
+        exit 1;
+    fi
+
+    # Update config file
+    set_property "auth-provider" "net.sourceforge.guacamole.net.auth.mysql.MySQLAuthenticationProvider"
+    set_property "mysql-hostname" "$MYSQL_PORT_3306_TCP_ADDR"
+    set_property "mysql-port"     "$MYSQL_PORT_3306_TCP_PORT"
+    set_property "mysql-database" "$MYSQL_DATABASE"
+    set_property "mysql-username" "$MYSQL_USER"
+    set_property "mysql-password" "$MYSQL_PASSWORD"
+
+    # Add required .jar files to GUACAMOLE_LIB
+    ln -s /opt/guac/mysql/*.jar "$GUACAMOLE_LIB"
+
+}
+
 associate_postgresql() {
 
     # Verify required link is present
