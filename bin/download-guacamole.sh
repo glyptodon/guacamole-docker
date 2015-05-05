@@ -21,9 +21,18 @@
 # THE SOFTWARE.
 #
 
-#
-# download-guacamole.sh: Downloads Guacamole, saving the specified version to "guacamole.war"
-#
+##
+## @fn download-guacamole.sh
+##
+## Downloads Guacamole, saving the specified version to "guacamole.war" within
+## the given directory.
+##
+## @param VERSION
+##     The version of guacamole.war to download, such as "0.9.6".
+##
+## @param DESTINATION
+##     The directory to save guacamole.war within.
+##
 
 VERSION="$1"
 DESTINATION="$2"

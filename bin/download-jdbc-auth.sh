@@ -21,9 +21,24 @@
 # THE SOFTWARE.
 #
 
-#
-# download-jdbc-auth.sh: Downloads JDBC authentication support
-#
+##
+## @fn download-jdbc-auth.sh
+##
+## Downloads JDBC authentication support, including any required JDBC drivers.
+## The downloaded files will be grouped by their associated database type, with
+## all MySQL files being placed within the "mysql/" subdirectory of the
+## destination, and all PostgreSQL files being placed within the "postgresql/"
+## subdirectory of the destination.
+##
+## @param VERSION
+##     The version of guacamole-auth-jdbc to download, such as "0.9.6".
+##
+## @param DESTINATION
+##     The directory to save downloaded files within. Note that this script
+##     will create database-specific subdirectories within this directory,
+##     and downloaded files will be thus grouped by their respected database
+##     types.
+##
 
 VERSION="$1"
 DESTINATION="$2"

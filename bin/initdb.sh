@@ -21,12 +21,23 @@
 # THE SOFTWARE.
 #
 
-#
-# initdb.sh: Generates a database initialization SQL script
-#
+##
+## @fn initdb.sh
+##
+## Generates a database initialization SQL script for a database of the given
+## type. The SQL will be sent to STDOUT.
+##
+## @param DATABASE
+##     The database to generate the SQL script for. This may be either
+##     "--postgres", for PostgreSQL, or "--mysql" for MySQL.
+##
 
 DATABASE="$1"
 
+##
+## Prints usage information for this shell script and exits with an error code.
+## Calling this function will immediately terminate execution of the script.
+##
 incorrect_usage() {
     cat <<END
 USAGE: /opt/guacamole/bin/initdb.sh [--postgres | --mysql]

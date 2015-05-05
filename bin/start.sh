@@ -21,14 +21,30 @@
 # THE SOFTWARE.
 #
 
-#
-# start.sh: Automatically configures and starts Guacamole
-#
+##
+## @fn start.sh
+##
+## Automatically configures and starts Guacamole under Tomcat. Guacamole's
+## guacamole.properties file will be automatically generated based on the
+## linked database container (either MySQL or PostgreSQL) and the linked guacd
+## container. The Tomcat process will ultimately replace the process of this
+## script, running in the foreground until terminated.
+##
 
 GUACAMOLE_HOME="$HOME/.guacamole"
 GUACAMOLE_LIB="$GUACAMOLE_HOME/lib"
 GUACAMOLE_PROPERTIES="$GUACAMOLE_HOME/guacamole.properties"
 
+##
+## Sets the given property to the given value within guacamole.properties,
+## creating guacamole.properties first if necessary.
+##
+## @param NAME
+##     The name of the property to set.
+##
+## @param VALUE
+##     The value to set the property to.
+##
 set_property() {
 
     NAME="$1"
@@ -45,6 +61,11 @@ set_property() {
 
 }
 
+##
+## Adds properties to guacamole.properties which select the MySQL
+## authentication provider, and configure it to connect to the linked MySQL
+## container.
+##
 associate_mysql() {
 
     # Verify required link is present
@@ -91,6 +112,11 @@ END
 
 }
 
+##
+## Adds properties to guacamole.properties which select the PostgreSQL
+## authentication provider, and configure it to connect to the linked
+## PostgreSQL container.
+##
 associate_postgresql() {
 
     # Verify required link is present
@@ -137,6 +163,11 @@ END
 
 }
 
+##
+## Starts Guacamole under Tomcat, replacing the current process with the
+## Tomcat process. As the current process will be replaced, this MUST be the
+## last function run within the script.
+##
 start_guacamole() {
     cd /usr/local/tomcat
     exec catalina.sh run
