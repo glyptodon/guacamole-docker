@@ -45,7 +45,8 @@ tar -xz                  \
     --wildcards          \
     --no-anchored        \
     --strip-components=1 \
-    "*.jar"
+    "*.jar"              \
+    "*.sql"
 
 #
 # Download MySQL JDBC driver
