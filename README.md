@@ -1,19 +1,124 @@
+What is Guacamole?
+==================
 
-About this Repository
+[Guacamole](http://guac-dev.org/) is a clientless remote desktop gateway. It
+supports standard protocols like VNC and RDP. We call it clientless because no
+plugins or client software are required.
+
+Thanks to HTML5, once Guacamole is installed on a server, all you need to
+access your desktops is a web browser.
+
+How to use this image
 =====================
 
-This repository provides a Docker image for the
-[guacamole-client](https://github.com/glyptodon/guacamole-client/) project, the
-the web application portion of [Guacamole](http://guac-dev.org/) which serves
-the JavaScript client to connected users, and functions as an authenticating
-tunnel between the client and server.
+Using this image will require an existing, running Docker container with the
+[guacd image](https://registry.hub.docker.com/u/glyptodon/guacd/), and another
+Docker container providing either a PostgreSQL or MySQL database.
 
-Although intended to become the officially-maintained Docker image for the
-guacamole-client portion of the [Guacamole project](http://guac-dev.org/), this
-is our first adventure into the world of Docker, and is thus experimental. Once
-it proves itself, this will be adopted within the Glyptodon repositories, and
-become part of each Guacamole release, not to mention officially-documented.
+The name of the database and all associated credentials are specified with
+environment variables given when the container is created. All other
+configuration information is generated from the Docker links.
 
-Please report any bugs encountered by opening a new issue in the JIRA system
-hosted at: http://glyptodon.org/jira/
+Beware that you will need to initialize the database manually. Guacamole will
+not automatically create its own tables, but SQL scripts are provided to do
+this.
+
+Deploying Guacamole with PostgreSQL authentication
+--------------------------------------------------
+
+    docker run --name some-guacamole --link some-guacd:guacd \
+        --link some-postgres:postgres      \
+        -e POSTGRES_DATABASE=guacamole_db  \
+        -e POSTGRES_USER=guacamole_user    \
+        -e POSTGRES_PASSWORD=some_password \
+        -d -p 8080:8080 glyptodon/guacamole
+
+Linking Guacamole to PostgreSQL requires three environment variables. If any of
+these environment variables are omitted, you will receive an error message, and
+the image will stop:
+
+Name                | Description
+------------------- | -----------
+`POSTGRES_DATABASE` | The name of the database to use for Guacamole authentication.
+`POSTGRES_USER`     | The user that Guacamole will use to connect to PostgreSQL.
+`POSTGRES_PASSWORD` | The password that Guacamole will provide when connecting to PostgreSQL as `POSTGRES_USER`.
+
+### Initializing the PostgreSQL database
+
+If your database is not already initialized with the Guacamole schema, you will
+need to do so prior to using Guacamole. A convenience script for generating the
+necessary SQL to do this is included in the Guacamole image.
+
+To generate a SQL script which can be used to initialize a fresh PostgreSQL
+database [as documented in the Guacamole
+manual](http://guac-dev.org/doc/gug/jdbc-auth.html#jdbc-auth-postgresql):
+
+    docker run --rm glyptodon/guacamole /opt/guacamole/bin/initdb.sh --postgres > initdb.sql
+
+Alternatively, you can use the SQL scripts included with
+[guacamole-auth-jdbc](http://sourceforge.net/projects/guacamole/files/current/extensions/guacamole-auth-jdbc-0.9.6.tar.gz/download).
+
+Once this script is generated, you must:
+
+1. Create a database for Guacamole within PostgreSQL, such as `guacamole_db`.
+2. Run the script on the newly-created database.
+3. Create a user for Guacamole within PostgreSQL with access to the tables and
+   sequences of this database, such as `guacamole_user`.
+
+The process for doing this via the `psql` and `createdb` utilities included
+with PostgreSQL is documented in [the Guacamole
+manual](http://guac-dev.org/doc/gug/jdbc-auth.html#jdbc-auth-postgresql).
+
+Deploying Guacamole with MySQL authentication
+--------------------------------------------------
+
+    docker run --name some-guacamole --link some-guacd:guacd \
+        --link some-mysql:mysql         \
+        -e MYSQL_DATABASE=guacamole_db  \
+        -e MYSQL_USER=guacamole_user    \
+        -e MYSQL_PASSWORD=some_password \
+        -d -p 8080:8080 glyptodon/guacamole
+
+Linking Guacamole to MySQL requires three environment variables. If any of
+these environment variables are omitted, you will receive an error message, and
+the image will stop:
+
+Name             | Description
+---------------- | -----------
+`MYSQL_DATABASE` | The name of the database to use for Guacamole authentication.
+`MYSQL_USER`     | The user that Guacamole will use to connect to MySQL.
+`MYSQL_PASSWORD` | The password that Guacamole will provide when connecting to MySQL as `MYSQL_USER`.
+
+
+### Initializing the MySQL database
+
+If your database is not already initialized with the Guacamole schema, you will
+need to do so prior to using Guacamole. A convenience script for generating the
+necessary SQL to do this is included in the Guacamole image.
+
+To generate a SQL script which can be used to initialize a fresh MySQL database
+[as documented in the Guacamole
+manual](http://guac-dev.org/doc/gug/jdbc-auth.html#jdbc-auth-mysql):
+
+    docker run --rm glyptodon/guacamole /opt/guacamole/bin/initdb.sh --mysql > initdb.sql
+
+Alternatively, you can use the SQL scripts included with
+[guacamole-auth-jdbc](http://sourceforge.net/projects/guacamole/files/current/extensions/guacamole-auth-jdbc-0.9.6.tar.gz/download).
+
+Once this script is generated, you must:
+
+1. Create a database for Guacamole within MySQL, such as `guacamole_db`.
+2. Create a user for Guacamole within MySQL with access to this database, such
+   as `guacamole_user`.
+3. Run the script on the newly-created database.
+
+The process for doing this via the `mysql` utility included with MySQL is
+documented in [the Guacamole
+manual](http://guac-dev.org/doc/gug/jdbc-auth.html#jdbc-auth-mysql).
+
+Reporting issues
+================
+
+Please report any bugs encountered by opening a new issue in [our
+JIRA](http://glyptodon.org/jira/).
 
