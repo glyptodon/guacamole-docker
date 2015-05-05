@@ -42,11 +42,9 @@ Linking Guacamole to PostgreSQL requires three environment variables. If any of
 these environment variables are omitted, you will receive an error message, and
 the image will stop:
 
-Name                | Description
-------------------- | -----------
-`POSTGRES_DATABASE` | The name of the database to use for Guacamole authentication.
-`POSTGRES_USER`     | The user that Guacamole will use to connect to PostgreSQL.
-`POSTGRES_PASSWORD` | The password that Guacamole will provide when connecting to PostgreSQL as `POSTGRES_USER`.
+1. `POSTGRES_DATABASE`: The name of the database to use for Guacamole authentication.
+2. `POSTGRES_USER`: The user that Guacamole will use to connect to PostgreSQL.
+3. `POSTGRES_PASSWORD`: The password that Guacamole will provide when connecting to PostgreSQL as `POSTGRES_USER`.
 
 ### Initializing the PostgreSQL database
 
@@ -88,12 +86,9 @@ Linking Guacamole to MySQL requires three environment variables. If any of
 these environment variables are omitted, you will receive an error message, and
 the image will stop:
 
-Name             | Description
----------------- | -----------
-`MYSQL_DATABASE` | The name of the database to use for Guacamole authentication.
-`MYSQL_USER`     | The user that Guacamole will use to connect to MySQL.
-`MYSQL_PASSWORD` | The password that Guacamole will provide when connecting to MySQL as `MYSQL_USER`.
-
+1. `MYSQL_DATABASE`: The name of the database to use for Guacamole authentication.
+2. `MYSQL_USER`: The user that Guacamole will use to connect to MySQL.
+3. `MYSQL_PASSWORD`: The password that Guacamole will provide when connecting to MySQL as `MYSQL_USER`.
 
 ### Initializing the MySQL database
 
