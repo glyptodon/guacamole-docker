@@ -23,6 +23,11 @@ Beware that you will need to initialize the database manually. Guacamole will
 not automatically create its own tables, but SQL scripts are provided to do
 this.
 
+Once the Guacamole image is running, Guacamole will be accessible at
+`http://[address of container]:8080/guacamole/`. The instructions below use the
+`-p 8080:8080` option to expose this port at the level of the machine hosting
+Docker, as well.
+
 Deploying Guacamole with PostgreSQL authentication
 --------------------------------------------------
 
