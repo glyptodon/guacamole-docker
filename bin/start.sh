@@ -174,6 +174,12 @@ start_guacamole() {
 }
 
 #
+# Start with a fresh GUACAMOLE_HOME
+#
+
+rm -Rf "$GUACAMOLE_HOME"
+
+#
 # Create and define Guacamole lib directory
 #
 
