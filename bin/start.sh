@@ -32,6 +32,7 @@
 ##
 
 GUACAMOLE_HOME="$HOME/.guacamole"
+GUACAMOLE_EXT="$GUACAMOLE_HOME/extensions"
 GUACAMOLE_LIB="$GUACAMOLE_HOME/lib"
 GUACAMOLE_PROPERTIES="$GUACAMOLE_HOME/guacamole.properties"
 
@@ -100,15 +101,15 @@ END
     fi
 
     # Update config file
-    set_property "auth-provider" "net.sourceforge.guacamole.net.auth.mysql.MySQLAuthenticationProvider"
     set_property "mysql-hostname" "$MYSQL_PORT_3306_TCP_ADDR"
     set_property "mysql-port"     "$MYSQL_PORT_3306_TCP_PORT"
     set_property "mysql-database" "$MYSQL_DATABASE"
     set_property "mysql-username" "$MYSQL_USER"
     set_property "mysql-password" "$MYSQL_PASSWORD"
 
-    # Add required .jar files to GUACAMOLE_LIB
-    ln -s /opt/guacamole/mysql/*.jar "$GUACAMOLE_LIB"
+    # Add required .jar files to GUACAMOLE_LIB and GUACAMOLE_EXT
+    ln -s /opt/guacamole/mysql/mysql-connector-*.jar "$GUACAMOLE_LIB"
+    ln -s /opt/guacamole/mysql/guacamole-auth-*.jar "$GUACAMOLE_EXT"
 
 }
 
@@ -151,15 +152,15 @@ END
     fi
 
     # Update config file
-    set_property "auth-provider" "org.glyptodon.guacamole.auth.postgresql.PostgreSQLAuthenticationProvider"
     set_property "postgresql-hostname" "$POSTGRES_PORT_5432_TCP_ADDR"
     set_property "postgresql-port"     "$POSTGRES_PORT_5432_TCP_PORT"
     set_property "postgresql-database" "$POSTGRES_DATABASE"
     set_property "postgresql-username" "$POSTGRES_USER"
     set_property "postgresql-password" "$POSTGRES_PASSWORD"
 
-    # Add required .jar files to GUACAMOLE_LIB
-    ln -s /opt/guacamole/postgresql/*.jar "$GUACAMOLE_LIB"
+    # Add required .jar files to GUACAMOLE_LIB and GUACAMOLE_EXT
+    ln -s /opt/guacamole/postgresql/postgresql-*.jar "$GUACAMOLE_LIB"
+    ln -s /opt/guacamole/postgresql/guacamole-auth-*.jar "$GUACAMOLE_EXT"
 
 }
 
@@ -180,11 +181,11 @@ start_guacamole() {
 rm -Rf "$GUACAMOLE_HOME"
 
 #
-# Create and define Guacamole lib directory
+# Create and define Guacamole lib and extensions directories
 #
 
+mkdir -p "$GUACAMOLE_EXT"
 mkdir -p "$GUACAMOLE_LIB"
-set_property "lib-directory" "$GUACAMOLE_LIB"
 
 #
 # Point to associated guacd
