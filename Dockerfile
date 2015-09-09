@@ -30,8 +30,8 @@ MAINTAINER Michael Jumper <mike.jumper@guac-dev.org>
 
 # Version info
 ENV \
-    GUAC_VERSION=0.9.7      \
-    GUAC_JDBC_VERSION=0.9.7
+    GUAC_VERSION=0.9.8      \
+    GUAC_JDBC_VERSION=0.9.8
 
 # Add configuration scripts
 COPY bin /opt/guacamole/bin/
