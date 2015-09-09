@@ -53,8 +53,8 @@ need to do so prior to using Guacamole. A convenience script for generating the
 necessary SQL to do this is included in the Guacamole image.
 
 To generate a SQL script which can be used to initialize a fresh PostgreSQL
-database [as documented in the Guacamole
-manual](http://guac-dev.org/doc/gug/jdbc-auth.html#jdbc-auth-postgresql):
+database
+[as documented in the Guacamole manual](http://guac-dev.org/doc/gug/jdbc-auth.html#jdbc-auth-postgresql):
 
     docker run --rm glyptodon/guacamole /opt/guacamole/bin/initdb.sh --postgres > initdb.sql
 
@@ -69,8 +69,8 @@ Once this script is generated, you must:
    sequences of this database, such as `guacamole_user`.
 
 The process for doing this via the `psql` and `createdb` utilities included
-with PostgreSQL is documented in [the Guacamole
-manual](http://guac-dev.org/doc/gug/jdbc-auth.html#jdbc-auth-postgresql).
+with PostgreSQL is documented in
+[the Guacamole manual](http://guac-dev.org/doc/gug/jdbc-auth.html#jdbc-auth-postgresql).
 
 Deploying Guacamole with MySQL authentication
 --------------------------------------------------
@@ -97,8 +97,7 @@ need to do so prior to using Guacamole. A convenience script for generating the
 necessary SQL to do this is included in the Guacamole image.
 
 To generate a SQL script which can be used to initialize a fresh MySQL database
-[as documented in the Guacamole
-manual](http://guac-dev.org/doc/gug/jdbc-auth.html#jdbc-auth-mysql):
+[as documented in the Guacamole manual](http://guac-dev.org/doc/gug/jdbc-auth.html#jdbc-auth-mysql):
 
     docker run --rm glyptodon/guacamole /opt/guacamole/bin/initdb.sh --mysql > initdb.sql
 
@@ -113,12 +112,12 @@ Once this script is generated, you must:
 3. Run the script on the newly-created database.
 
 The process for doing this via the `mysql` utility included with MySQL is
-documented in [the Guacamole
-manual](http://guac-dev.org/doc/gug/jdbc-auth.html#jdbc-auth-mysql).
+documented in
+[the Guacamole manual](http://guac-dev.org/doc/gug/jdbc-auth.html#jdbc-auth-mysql).
 
 Reporting issues
 ================
 
-Please report any bugs encountered by opening a new issue in [our
-JIRA](http://glyptodon.org/jira/).
+Please report any bugs encountered by opening a new issue in
+[our JIRA](http://glyptodon.org/jira/).
 
