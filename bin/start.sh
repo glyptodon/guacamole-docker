@@ -141,17 +141,44 @@ END
 ##
 ## Adds properties to guacamole.properties which select the PostgreSQL
 ## authentication provider, and configure it to connect to the linked
-## PostgreSQL container.
+## PostgreSQL container. If a PostgreSQL database is explicitly specified using
+## the POSTGRES_HOSTNAME and POSTGRES_PORT environment variables, that will be
+## used instead of a linked container.
 ##
 associate_postgresql() {
 
-    # Verify required link is present
-    if [ -z "$POSTGRES_PORT_5432_TCP_ADDR" -o -z "$POSTGRES_PORT_5432_TCP_PORT" ]; then
+    # Use address from linked container if hostname not explicitly specified
+    if [ -z "$POSTGRES_HOSTNAME" ]; then
+        POSTGRES_HOSTNAME="$POSTGRES_PORT_5432_TCP_ADDR"
+    fi
+
+    # Use the port from linked container if not explicitly specified, finally
+    # defaulting to the standard port of 5432
+    if [ -z "$POSTGRES_PORT" ]; then
+        POSTGRES_PORT="${POSTGRES_PORT_5432_TCP_PORT-5432}"
+    fi
+
+    # Verify required connection information is present
+    if [ -z "$POSTGRES_HOSTNAME" -o -z "$POSTGRES_PORT" ]; then
         cat <<END
-FATAL: Missing "postgres" link.
+FATAL: Missing POSTGRES_HOSTNAME or "postgres" link.
 -------------------------------------------------------------------------------
-If using a PostgreSQL database, you must explicitly link the container
-providing that database with the link named "postgres".
+If using a PostgreSQL database, you must either:
+
+(a) Explicitly link that container with the link named "postgres".
+
+(b) If not using a Docker container for PostgreSQL, explicitly specify the TCP
+    connection to your database using the following environment variables:
+
+    POSTGRES_HOSTNAME  The hostname or IP address of the PostgreSQL server. If
+                       not using a PostgreSQL Docker container and
+                       corresponding link, this environment variable is
+                       *REQUIRED*.
+
+    POSTGRES_PORT      The port on which the PostgreSQL server is listening for
+                       TCP connections. This environment variable is option. If
+                       omitted, the standard PostgreSQL port of 5432 will be
+                       used.
 END
         exit 1;
     fi
@@ -177,8 +204,8 @@ END
     fi
 
     # Update config file
-    set_property "postgresql-hostname" "$POSTGRES_PORT_5432_TCP_ADDR"
-    set_property "postgresql-port"     "$POSTGRES_PORT_5432_TCP_PORT"
+    set_property "postgresql-hostname" "$POSTGRES_HOSTNAME"
+    set_property "postgresql-port"     "$POSTGRES_PORT"
     set_property "postgresql-database" "$POSTGRES_DATABASE"
     set_property "postgresql-username" "$POSTGRES_USER"
     set_property "postgresql-password" "$POSTGRES_PASSWORD"
