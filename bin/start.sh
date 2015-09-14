@@ -65,17 +65,42 @@ set_property() {
 ##
 ## Adds properties to guacamole.properties which select the MySQL
 ## authentication provider, and configure it to connect to the linked MySQL
-## container.
+## container. If a MySQL database is explicitly specified using the
+## MYSQL_HOSTNAME and MYSQL_PORT environment variables, that will be used
+## instead of a linked container.
 ##
 associate_mysql() {
 
-    # Verify required link is present
-    if [ -z "$MYSQL_PORT_3306_TCP_ADDR" -o -z "$MYSQL_PORT_3306_TCP_PORT" ]; then
+    # Use address from linked container if hostname not explicitly specified
+    if [ -z "$MYSQL_HOSTNAME" ]; then
+        MYSQL_HOSTNAME="$MYSQL_PORT_3306_TCP_ADDR"
+    fi
+
+    # Use the port from linked container if not explicitly specified, finally
+    # defaulting to the standard port of 3306
+    if [ -z "$MYSQL_PORT" ]; then
+        MYSQL_PORT="${MYSQL_PORT_3306_TCP_PORT-3306}"
+    fi
+
+    # Verify required connection information is present
+    if [ -z "$MYSQL_HOSTNAME" -o -z "$MYSQL_PORT" ]; then
         cat <<END
-FATAL: Missing "mysql" link.
+FATAL: Missing MYSQL_HOSTNAME or "mysql" link.
 -------------------------------------------------------------------------------
-If using a MySQL database, you must explicitly link the container providing
-that database with the link named "mysql".
+If using a MySQL database, you must either:
+
+(a) Explicitly link that container with the link named "mysql".
+
+(b) If not using a Docker container for MySQL, explicitly specify the TCP
+    connection to your database using the following environment variables:
+
+    MYSQL_HOSTNAME     The hostname or IP address of the MySQL server. If not
+                       using a MySQL Docker container and corresponding link,
+                       this environment variable is *REQUIRED*.
+
+    MYSQL_PORT         The port on which the MySQL server is listening for TCP
+                       connections. This environment variable is option. If
+                       omitted, the standard MySQL port of 3306 will be used.
 END
         exit 1;
     fi
@@ -101,8 +126,8 @@ END
     fi
 
     # Update config file
-    set_property "mysql-hostname" "$MYSQL_PORT_3306_TCP_ADDR"
-    set_property "mysql-port"     "$MYSQL_PORT_3306_TCP_PORT"
+    set_property "mysql-hostname" "$MYSQL_HOSTNAME"
+    set_property "mysql-port"     "$MYSQL_PORT"
     set_property "mysql-database" "$MYSQL_DATABASE"
     set_property "mysql-username" "$MYSQL_USER"
     set_property "mysql-password" "$MYSQL_PASSWORD"
