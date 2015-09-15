@@ -71,16 +71,14 @@ set_property() {
 ##
 associate_mysql() {
 
-    # Use address from linked container if hostname not explicitly specified
-    if [ -z "$MYSQL_HOSTNAME" ]; then
+    # Use linked container if specified
+    if [ -n "$MYSQL_NAME" ]; then
         MYSQL_HOSTNAME="$MYSQL_PORT_3306_TCP_ADDR"
+        MYSQL_PORT="$MYSQL_PORT_3306_TCP_PORT"
     fi
 
-    # Use the port from linked container if not explicitly specified, finally
-    # defaulting to the standard port of 3306
-    if [ -z "$MYSQL_PORT" ]; then
-        MYSQL_PORT="${MYSQL_PORT_3306_TCP_PORT-3306}"
-    fi
+    # Use default port if none specified
+    MYSQL_PORT="${MYSQL_PORT-3306}"
 
     # Verify required connection information is present
     if [ -z "$MYSQL_HOSTNAME" -o -z "$MYSQL_PORT" ]; then
@@ -147,16 +145,14 @@ END
 ##
 associate_postgresql() {
 
-    # Use address from linked container if hostname not explicitly specified
-    if [ -z "$POSTGRES_HOSTNAME" ]; then
+    # Use linked container if specified
+    if [ -n "$POSTGRES_NAME" ]; then
         POSTGRES_HOSTNAME="$POSTGRES_PORT_5432_TCP_ADDR"
+        POSTGRES_PORT="$POSTGRES_PORT_5432_TCP_PORT"
     fi
 
-    # Use the port from linked container if not explicitly specified, finally
-    # defaulting to the standard port of 5432
-    if [ -z "$POSTGRES_PORT" ]; then
-        POSTGRES_PORT="${POSTGRES_PORT_5432_TCP_PORT-5432}"
-    fi
+    # Use default port if none specified
+    POSTGRES_PORT="${POSTGRES_PORT-5432}"
 
     # Verify required connection information is present
     if [ -z "$POSTGRES_HOSTNAME" -o -z "$POSTGRES_PORT" ]; then
