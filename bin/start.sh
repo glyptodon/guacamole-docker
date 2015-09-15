@@ -71,8 +71,8 @@ set_property() {
 ##
 associate_mysql() {
 
-    # Use address from linked container if hostname not explicitly specified
-    if [ -z "$MYSQL_HOSTNAME" ]; then
+    # Use linked container if specified
+    if [ -n "$MYSQL_NAME" ]; then
         MYSQL_HOSTNAME="$MYSQL_PORT_3306_TCP_ADDR"
         MYSQL_PORT="$MYSQL_PORT_3306_TCP_PORT"
     fi
@@ -145,8 +145,8 @@ END
 ##
 associate_postgresql() {
 
-    # Use address from linked container if hostname not explicitly specified
-    if [ -z "$POSTGRES_HOSTNAME" ]; then
+    # Use linked container if specified
+    if [ -n "$POSTGRES_NAME" ]; then
         POSTGRES_HOSTNAME="$POSTGRES_PORT_5432_TCP_ADDR"
         POSTGRES_PORT="$POSTGRES_PORT_5432_TCP_PORT"
     fi
