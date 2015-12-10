@@ -41,7 +41,7 @@ RUN \
     /opt/guacamole/bin/download-guacamole.sh "$GUAC_VERSION" /usr/local/tomcat/webapps && \
     /opt/guacamole/bin/download-jdbc-auth.sh "$GUAC_JDBC_VERSION" /opt/guacamole
 
-# Start Guacamole under Tomcat, listening on 0.0.0.0:8080
-EXPOSE 8080
+# Start Guacamole under Tomcat, listening on 0.0.0.0:8181
+EXPOSE 8181
 CMD ["/opt/guacamole/bin/start.sh" ]
 
