@@ -22,16 +22,19 @@
 #
 
 ##
-## @fn download-guacamole.sh
+## @fn download-extension.sh
 ##
-## Downloads Guacamole, saving the specified version to "guacamole.war" within
-## the given directory.
+## Downloads Guacamole extensions, extracts the .jar file, and saves it the 
+## the specified version to the given directory.
+##
+## @param EXTENSION
+##     The name of the extension to download, such as "guacamole-auth-noauth".
 ##
 ## @param VERSION
 ##     The version of guacamole.war to download, such as "0.9.6".
 ##
 ## @param DESTINATION
-##     The directory to save guacamole.war within.
+##     The directory to save the extension.jar to.
 ##
 
 EXTENSION="$1"
@@ -45,7 +48,8 @@ DESTINATION="$3"
 mkdir -p "$DESTINATION"
 
 #
-# Download extension.tar.gz, extract the .jar, and place in specified destination
+# Download extension.tar.gz, extract the .jar, and place in specified 
+# destination
 #
 
 echo "Downloading Guacamole Extension $EXTENSION version $VERSION to $DESTINATION ..."
