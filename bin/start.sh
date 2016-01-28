@@ -213,6 +213,25 @@ END
 }
 
 ##
+## Adds properties to guacamole.properties which select the NoAuth
+## authentication provider, and configure it to load settings from either 
+## /etc/guacamole/noauth-config.xml (default) or from the file path specified
+## by the NOAUTH_CONFIG environment variable.
+##
+associate_noauth() {
+    if [ ! -n "$NOAUTH_CONFIG" ]; then
+        NOAUTH_CONFIG="/etc/guacamole/noauth-config.xml"
+    fi
+    
+    # Update config file
+    set_property "noauth-config" "$NOAUTH_CONFIG"
+
+    # Add required .jar files to GUACAMOLE_EXT
+    ln -s /opt/guacamole/extensions/guacamole-auth-noauth*.jar \
+        "$GUACAMOLE_EXT"
+}
+
+##
 ## Starts Guacamole under Tomcat, replacing the current process with the
 ## Tomcat process. As the current process will be replaced, this MUST be the
 ## last function run within the script.
@@ -258,26 +277,27 @@ set_property "guacd-port"     "$GUACD_PORT_4822_TCP_PORT"
 # Point to associated PostgreSQL
 #
 
-# Only one database may be used
-if [ -n "$MYSQL_DATABASE" -a -n "$POSTGRES_DATABASE" ]; then
+# Only one auth provider may be used
+if [ -n "$MYSQL_DATABASE" -a -n "$POSTGRES_DATABASE" -a -n "$NOAUTH"]; then
     cat <<END
-FATAL: Both MySQL and PostgreSQL databases specified
+FATAL: More than one auth provider specified (MySQL, PostgreSQL, or NoAuth)
 -------------------------------------------------------------------------------
-You have specified both the MYSQL_DATABASE and POSTGRES_DATABASE environment
-variables, but the Guacamole Docker container supports only one database.
-Please specify only MYSQL_DATABASE or POSTGRES_DATABASE, not both.
+You have specified more than one of MYSQL_DATABASE, POSTGRES_DATABASE, or
+NOAUTH environment variables, but the Guacamole Docker container supports only 
+one auth provider.  Please specify only MYSQL_DATABASE, POSTGRES_DATABASE, or
+NOAUTH (not more than one).
 END
     exit 1;
 fi
 
-# At least one database must be given
-if [ -z "$MYSQL_DATABASE" -a -z "$POSTGRES_DATABASE" ]; then
+# At least one auth provider must be given
+if [ -z "$MYSQL_DATABASE" -a -z "$POSTGRES_DATABASE" -a -z "$NOAUTH" ]; then
     cat <<END
-FATAL: No database specified
+FATAL: No auth provider specified
 -------------------------------------------------------------------------------
-The Guacamole Docker container needs an associated MySQL or PostgreSQL database
-in order to function. Please specify either the MYSQL_DATABASE or
-POSTGRES_DATABASE environment variables.
+The Guacamole Docker container needs an associated auth provider in order to 
+function. Please specify either the MYSQL_DATABASE, POSTGRES_DATABASE, or
+NOAUTH environment variables.
 END
     exit 1;
 fi
@@ -290,6 +310,11 @@ fi
 # Use PostgreSQL if database specified
 if [ -n "$POSTGRES_DATABASE" ]; then
     associate_postgresql
+fi
+
+# Use NoAuth Extension if specified
+if [ -n "$NOAUTH" ]; then
+    associate_noauth
 fi
 
 #
