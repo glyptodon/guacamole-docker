@@ -63,6 +63,29 @@ set_property() {
 }
 
 ##
+## Sets the given property to the given value within guacamole.properties only
+## if a value is provided, creating guacamole.properties first if necessary.
+##
+## @param NAME
+##     The name of the property to set.
+##
+## @param VALUE
+##     The value to set the property to, if any. If omitted or empty, the
+##     property will not be set.
+##
+set_optional_property() {
+
+    NAME="$1"
+    VALUE="$2"
+
+    # Set the property only if a value is provided
+    if [ -n "$VALUE" ]; then
+        set_property "$NAME" "$VALUE"
+    fi
+
+}
+
+##
 ## Adds properties to guacamole.properties which select the MySQL
 ## authentication provider, and configure it to connect to the linked MySQL
 ## container. If a MySQL database is explicitly specified using the
@@ -129,6 +152,22 @@ END
     set_property "mysql-database" "$MYSQL_DATABASE"
     set_property "mysql-username" "$MYSQL_USER"
     set_property "mysql-password" "$MYSQL_PASSWORD"
+
+    set_optional_property               \
+        "mysql-default-max-connections" \
+        "$MYSQL_DEFAULT_MAX_CONNECTIONS"
+
+    set_optional_property                     \
+        "mysql-default-max-group-connections" \
+        "$MYSQL_DEFAULT_MAX_GROUP_CONNECTIONS"
+
+    set_optional_property                        \
+        "mysql-default-max-connections-per-user" \
+        "$MYSQL_DEFAULT_MAX_CONNECTIONS_PER_USER"
+
+    set_optional_property                              \
+        "mysql-default-max-group-connections-per-user" \
+        "$MYSQL_DEFAULT_MAX_GROUP_CONNECTIONS_PER_USER"
 
     # Add required .jar files to GUACAMOLE_LIB and GUACAMOLE_EXT
     ln -s /opt/guacamole/mysql/mysql-connector-*.jar "$GUACAMOLE_LIB"
@@ -205,6 +244,22 @@ END
     set_property "postgresql-database" "$POSTGRES_DATABASE"
     set_property "postgresql-username" "$POSTGRES_USER"
     set_property "postgresql-password" "$POSTGRES_PASSWORD"
+
+    set_optional_property                    \
+        "postgresql-default-max-connections" \
+        "$POSTGRES_DEFAULT_MAX_CONNECTIONS"
+
+    set_optional_property                          \
+        "postgresql-default-max-group-connections" \
+        "$POSTGRES_DEFAULT_MAX_GROUP_CONNECTIONS"
+
+    set_optional_property                             \
+        "postgresql-default-max-connections-per-user" \
+        "$POSTGRES_DEFAULT_MAX_CONNECTIONS_PER_USER"
+
+    set_optional_property                                   \
+        "postgresql-default-max-group-connections-per-user" \
+        "$POSTGRES_DEFAULT_MAX_GROUP_CONNECTIONS_PER_USER"
 
     # Add required .jar files to GUACAMOLE_LIB and GUACAMOLE_EXT
     ln -s /opt/guacamole/postgresql/postgresql-*.jar "$GUACAMOLE_LIB"
