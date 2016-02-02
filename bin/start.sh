@@ -63,6 +63,29 @@ set_property() {
 }
 
 ##
+## Sets the given property to the given value within guacamole.properties only
+## if a value is provided, creating guacamole.properties first if necessary.
+##
+## @param NAME
+##     The name of the property to set.
+##
+## @param VALUE
+##     The value to set the property to, if any. If omitted or empty, the
+##     property will not be set.
+##
+set_optional_property() {
+
+    NAME="$1"
+    VALUE="$2"
+
+    # Set the property only if a value is provided
+    if [ -n "$VALUE" ]; then
+        set_property "$NAME" "$VALUE"
+    fi
+
+}
+
+##
 ## Adds properties to guacamole.properties which select the MySQL
 ## authentication provider, and configure it to connect to the linked MySQL
 ## container. If a MySQL database is explicitly specified using the
