@@ -310,41 +310,38 @@ set_property "guacd-hostname" "$GUACD_PORT_4822_TCP_ADDR"
 set_property "guacd-port"     "$GUACD_PORT_4822_TCP_PORT"
 
 #
-# Point to associated PostgreSQL
+# Track which authentication backends are installed
 #
 
-# Only one database may be used
-if [ -n "$MYSQL_DATABASE" -a -n "$POSTGRES_DATABASE" ]; then
-    cat <<END
-FATAL: Both MySQL and PostgreSQL databases specified
--------------------------------------------------------------------------------
-You have specified both the MYSQL_DATABASE and POSTGRES_DATABASE environment
-variables, but the Guacamole Docker container supports only one database.
-Please specify only MYSQL_DATABASE or POSTGRES_DATABASE, not both.
-END
-    exit 1;
-fi
-
-# At least one database must be given
-if [ -z "$MYSQL_DATABASE" -a -z "$POSTGRES_DATABASE" ]; then
-    cat <<END
-FATAL: No database specified
--------------------------------------------------------------------------------
-The Guacamole Docker container needs an associated MySQL or PostgreSQL database
-in order to function. Please specify either the MYSQL_DATABASE or
-POSTGRES_DATABASE environment variables.
-END
-    exit 1;
-fi
+INSTALLED_AUTH=""
 
 # Use MySQL if database specified
 if [ -n "$MYSQL_DATABASE" ]; then
     associate_mysql
+    INSTALLED_AUTH="$INSTALLED_AUTH mysql"
 fi
 
 # Use PostgreSQL if database specified
 if [ -n "$POSTGRES_DATABASE" ]; then
     associate_postgresql
+    INSTALLED_AUTH="$INSTALLED_AUTH postgres"
+fi
+
+#
+# Validate that at least one authentication backend is installed
+#
+
+if [ -z "$INSTALLED_AUTH" ]; then
+    cat <<END
+FATAL: No authentication configured
+-------------------------------------------------------------------------------
+The Guacamole Docker container needs at least one authentication mechanism in
+order to function, such as a MySQL database, PostgreSQL database, or LDAP
+directory.  Please specify at least the MYSQL_DATABASE or POSTGRES_DATABASE
+environment variables, or check Guacamole's Docker documentation regarding
+configuring LDAP.
+END
+    exit 1;
 fi
 
 #
