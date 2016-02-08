@@ -268,6 +268,53 @@ END
 }
 
 ##
+## Adds properties to guacamole.properties which select the LDAP
+## authentication provider, and configure it to connect to the specified LDAP
+## directory.
+##
+associate_ldap() {
+
+    # Verify required parameters are present
+    if [ -z "$LDAP_HOSTNAME" -o -z "$LDAP_USER_BASE_DN" ]; then
+        cat <<END
+FATAL: Missing required environment variables
+-------------------------------------------------------------------------------
+If using an LDAP directory, you must provide each of the following environment
+variables:
+
+    LDAP_HOSTNAME      The hostname or IP address of your LDAP server.
+
+    LDAP_USER_BASE_DN  The base DN under which all Guacamole users will be
+                       located. Absolutely all Guacamole users that will
+                       authenticate via LDAP must exist within the subtree of
+                       this DN.
+END
+        exit 1;
+    fi
+
+    # Update config file
+    set_property          "ldap-hostname"           "$LDAP_HOSTNAME"
+    set_optional_property "ldap-port"               "$LDAP_PORT"
+    set_optional_property "ldap-encryption-method"  "$LDAP_ENCRYPTION_METHOD"
+    set_property          "ldap-user-base-dn"       "$LDAP_USER_BASE_DN"
+    set_optional_property "ldap-username-attribute" "$LDAP_USERNAME_ATTRIBUTE"
+    set_optional_property "ldap-group-base-dn"      "$LDAP_GROUP_BASE_DN"
+    set_optional_property "ldap-config-base-dn"     "$LDAP_CONFIG_BASE_DN"
+
+    set_optional_property     \
+        "ldap-search-bind-dn" \
+        "$LDAP_SEARCH_BIND_DN"
+
+    set_optional_property           \
+        "ldap-search-bind-password" \
+        "$LDAP_SEARCH_BIND_PASSWORD"
+
+    # Add required .jar files to GUACAMOLE_EXT
+    ln -s /opt/guacamole/ldap/guacamole-auth-*.jar "$GUACAMOLE_EXT"
+
+}
+
+##
 ## Starts Guacamole under Tomcat, replacing the current process with the
 ## Tomcat process. As the current process will be replaced, this MUST be the
 ## last function run within the script.
@@ -310,41 +357,44 @@ set_property "guacd-hostname" "$GUACD_PORT_4822_TCP_ADDR"
 set_property "guacd-port"     "$GUACD_PORT_4822_TCP_PORT"
 
 #
-# Point to associated PostgreSQL
+# Track which authentication backends are installed
 #
 
-# Only one database may be used
-if [ -n "$MYSQL_DATABASE" -a -n "$POSTGRES_DATABASE" ]; then
-    cat <<END
-FATAL: Both MySQL and PostgreSQL databases specified
--------------------------------------------------------------------------------
-You have specified both the MYSQL_DATABASE and POSTGRES_DATABASE environment
-variables, but the Guacamole Docker container supports only one database.
-Please specify only MYSQL_DATABASE or POSTGRES_DATABASE, not both.
-END
-    exit 1;
-fi
-
-# At least one database must be given
-if [ -z "$MYSQL_DATABASE" -a -z "$POSTGRES_DATABASE" ]; then
-    cat <<END
-FATAL: No database specified
--------------------------------------------------------------------------------
-The Guacamole Docker container needs an associated MySQL or PostgreSQL database
-in order to function. Please specify either the MYSQL_DATABASE or
-POSTGRES_DATABASE environment variables.
-END
-    exit 1;
-fi
+INSTALLED_AUTH=""
 
 # Use MySQL if database specified
 if [ -n "$MYSQL_DATABASE" ]; then
     associate_mysql
+    INSTALLED_AUTH="$INSTALLED_AUTH mysql"
 fi
 
 # Use PostgreSQL if database specified
 if [ -n "$POSTGRES_DATABASE" ]; then
     associate_postgresql
+    INSTALLED_AUTH="$INSTALLED_AUTH postgres"
+fi
+
+# Use LDAP directory if specified
+if [ -n "$LDAP_HOSTNAME" ]; then
+    associate_ldap
+    INSTALLED_AUTH="$INSTALLED_AUTH ldap"
+fi
+
+#
+# Validate that at least one authentication backend is installed
+#
+
+if [ -z "$INSTALLED_AUTH" ]; then
+    cat <<END
+FATAL: No authentication configured
+-------------------------------------------------------------------------------
+The Guacamole Docker container needs at least one authentication mechanism in
+order to function, such as a MySQL database, PostgreSQL database, or LDAP
+directory.  Please specify at least the MYSQL_DATABASE or POSTGRES_DATABASE
+environment variables, or check Guacamole's Docker documentation regarding
+configuring LDAP.
+END
+    exit 1;
 fi
 
 #
