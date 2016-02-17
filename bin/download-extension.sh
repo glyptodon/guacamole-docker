@@ -1,3 +1,4 @@
+#!/bin/sh -e
 #
 # Copyright (C) 2015 Glyptodon LLC
 #
@@ -20,31 +21,42 @@
 # THE SOFTWARE.
 #
 
+##
+## @fn download-extension.sh
+##
+## Downloads Guacamole extensions, extracts the .jar file, and saves it the
+## the specified version to the given directory.
+##
+## @param EXTENSION
+##     The name of the extension to download, such as "guacamole-auth-noauth".
+##
+## @param VERSION
+##     The version of guacamole.war to download, such as "0.9.6".
+##
+## @param DESTINATION
+##     The directory to save the extension.jar to.
+##
+
+EXTENSION="$1"
+VERSION="$2"
+DESTINATION="$3"
+
 #
-# Dockerfile for guacamole-client
+# Create destination, if it does not yet exist
 #
 
-# Start from Tomcat image
-FROM tomcat:8.0.20-jre7
-MAINTAINER Michael Jumper <mike.jumper@guac-dev.org>
+mkdir -p "$DESTINATION"
 
-# Version info
-ENV \
-    GUAC_VERSION=0.9.9      \
-    GUAC_JDBC_VERSION=0.9.9 \
-    GUAC_LDAP_VERSION=0.9.9
+#
+# Download extension.tar.gz, extract the .jar, and place in specified
+# destination
+#
 
-# Add configuration scripts
-COPY bin /opt/guacamole/bin/
+echo "Downloading Guacamole Extension $EXTENSION version $VERSION to $DESTINATION ..."
+curl -L "http://downloads.sourceforge.net/project/guacamole/current/extensions/${EXTENSION}-${VERSION}.tar.gz" > "/opt/guacamole/extensions/${EXTENSION}-${VERSION}.tar.gz"
 
-# Download and install latest guacamole-client and authentication
-RUN \
-    /opt/guacamole/bin/download-guacamole.sh "$GUAC_VERSION" /usr/local/tomcat/webapps && \
-    /opt/guacamole/bin/download-jdbc-auth.sh "$GUAC_JDBC_VERSION" /opt/guacamole       && \
-    /opt/guacamole/bin/download-ldap-auth.sh "$GUAC_LDAP_VERSION" /opt/guacamole       && \
-    /opt/guacamole/bin/download-extension.sh "guacamole-auth-noauth" "$GUAC_VERSION" /opt/guacamole/extensions
-
-# Start Guacamole under Tomcat, listening on 0.0.0.0:8080
-EXPOSE 8080
-CMD ["/opt/guacamole/bin/start.sh" ]
-
+cd /opt/guacamole/extensions
+tar -zxf ${EXTENSION}-${VERSION}.tar.gz
+mv ${EXTENSION}-${VERSION}/${EXTENSION}-${VERSION}.jar .
+rm -f ${EXTENSION}-${VERSION}.tar.gz
+cd -
