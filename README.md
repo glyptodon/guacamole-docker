@@ -14,6 +14,8 @@ How to use this image
 Using this image will require an existing, running Docker container with the
 [guacd image](https://registry.hub.docker.com/u/glyptodon/guacd/), and another
 Docker container providing either a PostgreSQL or MySQL database.
+Alternatively, you can also run with authentication disabled (not recommended
+in production or untrusted environments for obvious reasons).
 
 The name of the database and all associated credentials are specified with
 environment variables given when the container is created. All other
@@ -73,7 +75,7 @@ with PostgreSQL is documented in
 [the Guacamole manual](http://guac-dev.org/doc/gug/jdbc-auth.html#jdbc-auth-postgresql).
 
 Deploying Guacamole with MySQL authentication
---------------------------------------------------
+---------------------------------------------
 
     docker run --name some-guacamole --link some-guacd:guacd \
         --link some-mysql:mysql         \
@@ -114,6 +116,51 @@ Once this script is generated, you must:
 The process for doing this via the `mysql` utility included with MySQL is
 documented in
 [the Guacamole manual](http://guac-dev.org/doc/gug/jdbc-auth.html#jdbc-auth-mysql).
+
+Deploying Guacamole with Authentication Disabled
+-------------------------------------------------
+
+    docker run --name some-guacamole --link some-guacd:guacd \
+        -e NOAUTH=1 \
+        -v /path/to/noauth-config.xml:/etc/guacamole/noauth-config.xml \
+        -d -p 8080:8080 glyptodon/guacamole
+
+Guacamole will look for configurations in the file specified by the
+`NOAUTH_CONFIG` environment variable.  If the `NOAUTH_CONFIG` environment
+variable is not passed into the container, Guacamole will default to
+`/etc/guacamole/noauth-config.xml` (inside the container).  Therefore,
+the configuration file must be passed as a volume in order to define the
+connections.
+
+An example configuration for the NoAuth extension looks like:
+
+    <configs>
+        <!-- node1 connections -->
+        <config name="node1-ssh" protocol="ssh">
+            <param name="hostname" value="192.168.0.101" />
+            <param name="username" value="root" />
+            <param name="password" value="OOBER_SECURE_PASSWORD" />
+        </config>
+        <config name="node1-vnc" protocol="vnc">
+            <param name="hostname" value="192.168.0.101" />
+            <param name="port">5901</param>
+            <param name="username" value="root" />
+            <param name="password" value="OOBER_SECURE_PASSWORD" />
+        </config>
+
+        <!-- node2 connections -->
+        <config name="node2-rdp" protocol="rdp">
+            <param name="hostname" value="192.168.0.102" />
+            <param name="port" value="3389" />
+            <param name="username" value="Administrator" />
+            <param name="password" value="OOBER_SECURE_PASSWORD" />
+        </config>
+    </configs>
+
+
+More information regarding disabling authentication via the NoAuth extension
+can be found in [the Guacamole manual](http://guac-dev.org/doc/gug/noauth.html).
+
 
 Reporting issues
 ================

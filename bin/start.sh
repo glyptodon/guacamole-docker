@@ -312,6 +312,22 @@ END
     # Add required .jar files to GUACAMOLE_EXT
     ln -s /opt/guacamole/ldap/guacamole-auth-*.jar "$GUACAMOLE_EXT"
 
+## Adds properties to guacamole.properties which select the NoAuth
+## authentication provider, and configure it to load settings from either
+## /etc/guacamole/noauth-config.xml (default) or from the file path specified
+## by the NOAUTH_CONFIG environment variable.
+##
+associate_noauth() {
+    if [ ! -n "$NOAUTH_CONFIG" ]; then
+        NOAUTH_CONFIG="/etc/guacamole/noauth-config.xml"
+    fi
+
+    # Update config file
+    set_property "noauth-config" "$NOAUTH_CONFIG"
+
+    # Add required .jar files to GUACAMOLE_EXT
+    ln -s /opt/guacamole/extensions/guacamole-auth-noauth*.jar \
+        "$GUACAMOLE_EXT"
 }
 
 ##
@@ -380,6 +396,13 @@ if [ -n "$LDAP_HOSTNAME" ]; then
     INSTALLED_AUTH="$INSTALLED_AUTH ldap"
 fi
 
+# Use NoAuth Extension if specified
+if [ -n "$NOAUTH" ]; then
+    associate_noauth
+    INSTALLED_AUTH="$INSTALLED_AUTH noauth"
+fi
+
+
 #
 # Validate that at least one authentication backend is installed
 #
@@ -389,10 +412,10 @@ if [ -z "$INSTALLED_AUTH" ]; then
 FATAL: No authentication configured
 -------------------------------------------------------------------------------
 The Guacamole Docker container needs at least one authentication mechanism in
-order to function, such as a MySQL database, PostgreSQL database, or LDAP
-directory.  Please specify at least the MYSQL_DATABASE or POSTGRES_DATABASE
-environment variables, or check Guacamole's Docker documentation regarding
-configuring LDAP.
+order to function, such as a MySQL database, PostgreSQL database, LDAP
+directory or NoAuth extension.  Please specify at least the MYSQL_DATABASE or
+POSTGRES_DATABASE environment variables, or check Guacamole's Docker
+documentation regarding configuring LDAP.
 END
     exit 1;
 fi
