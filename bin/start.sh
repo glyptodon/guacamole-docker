@@ -312,6 +312,8 @@ END
     # Add required .jar files to GUACAMOLE_EXT
     ln -s /opt/guacamole/ldap/guacamole-auth-*.jar "$GUACAMOLE_EXT"
 
+}
+
 ## Adds properties to guacamole.properties which select the NoAuth
 ## authentication provider, and configure it to load settings from either
 ## /etc/guacamole/noauth-config.xml (default) or from the file path specified
