@@ -154,6 +154,10 @@ END
     set_property "mysql-password" "$MYSQL_PASSWORD"
 
     set_optional_property               \
+        "mysql-absolute-max-connections" \
+        "$MYSQL_ABSOLUTE_MAX_CONNECTIONS"
+
+    set_optional_property               \
         "mysql-default-max-connections" \
         "$MYSQL_DEFAULT_MAX_CONNECTIONS"
 
@@ -244,6 +248,10 @@ END
     set_property "postgresql-database" "$POSTGRES_DATABASE"
     set_property "postgresql-username" "$POSTGRES_USER"
     set_property "postgresql-password" "$POSTGRES_PASSWORD"
+
+    set_optional_property               \
+        "postgresql-absolute-max-connections" \
+        "$POSTGRES_ABSOLUTE_MAX_CONNECTIONS"
 
     set_optional_property                    \
         "postgresql-default-max-connections" \
