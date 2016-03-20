@@ -43,6 +43,9 @@ RUN \
     /opt/guacamole/bin/download-jdbc-auth.sh "$GUAC_JDBC_VERSION" /opt/guacamole       && \
     /opt/guacamole/bin/download-ldap-auth.sh "$GUAC_LDAP_VERSION" /opt/guacamole
 
+# Make guacamole the default webapp
+RUN rm -rf /usr/local/tomcat/webapps/ROOT && ln -s /usr/local/tomcat/webapps/guacamole /usr/local/tomcat/webapps/ROOT
+
 # Start Guacamole under Tomcat, listening on 0.0.0.0:8080
 EXPOSE 8080
 CMD ["/opt/guacamole/bin/start.sh" ]
