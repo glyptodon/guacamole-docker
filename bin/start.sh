@@ -371,7 +371,7 @@ set_property "guacd-port"     "$GUACD_PORT_4822_TCP_PORT"
 INSTALLED_AUTH=""
 
 # Use MySQL if database specified
-if [ -n "$MYSQL_DATABASE" ]; then
+if [ -n "$MYSQL_DATABASE" ] || [ -n "$MYSQL_NAME" ]; then
     associate_mysql
     INSTALLED_AUTH="$INSTALLED_AUTH mysql"
 fi
