@@ -43,6 +43,11 @@ DESTINATION="$2"
 
 mkdir -p "$DESTINATION"
 
+ls -lh "$DESTINATION"
+rm -rf "$DESTINATION/ROOT/"
+mkdir "$DESTINATION/ROOT/"
+echo "<% response.sendRedirect(\"/guacamole\"); %>" > "$DESTINATION/ROOT/index.jsp"
+
 #
 # Download guacamole.war, placing in specified destination
 #
