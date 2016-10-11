@@ -1,7 +1,7 @@
 What is Guacamole?
 ==================
 
-This image extends the official Guacamole image with LDAP support.
+This image extends the official Guacamole image with LDAP support. It is forked from: https://github.com/glyptodon/guacamole-docker
 
 You can use tehse additional parameters:
 
