@@ -14,7 +14,7 @@ You can use tehse additional parameters:
 -      #LDAP_CONFIG_BASE_DN 
 -      LDAP_SEARCH_BIND_DN
 -      LDAP_SEARCH_BIND_PASSWORD
-
+ 
 Read the [official documentation](https://guacamole.incubator.apache.org/doc/gug/ldap-auth.html#idm140538189045056)
 
 
