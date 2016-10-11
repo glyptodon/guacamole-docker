@@ -1,6 +1,8 @@
 What is Guacamole?
 ==================
 
+This image extends the official Guacamole image with LDAP support.
+
 [Guacamole](http://guac-dev.org/) is a clientless remote desktop gateway. It
 supports standard protocols like VNC and RDP. We call it clientless because no
 plugins or client software are required.
