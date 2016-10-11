@@ -3,6 +3,21 @@ What is Guacamole?
 
 This image extends the official Guacamole image with LDAP support.
 
+You can use tehse additional parameters:
+
+-      LDAP_HOSTNAME
+-      LDAP_PORT
+-      LDAP_ENCRYPTION_METHOD
+-      LDAP_USER_BASE_DN
+-      LDAP_USERNAME_ATTRIBUTE
+-      #LDAP_GROUP_BASE_DN
+-      #LDAP_CONFIG_BASE_DN 
+-      LDAP_SEARCH_BIND_DN
+-      LDAP_SEARCH_BIND_PASSWORD
+
+Read the [official documentation](https://guacamole.incubator.apache.org/doc/gug/ldap-auth.html#idm140538189045056)
+
+
 [Guacamole](http://guac-dev.org/) is a clientless remote desktop gateway. It
 supports standard protocols like VNC and RDP. We call it clientless because no
 plugins or client software are required.
