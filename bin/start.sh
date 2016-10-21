@@ -336,7 +336,7 @@ start_guacamole() {
 # Start with a fresh GUACAMOLE_HOME
 #
 
-rm -Rf "$GUACAMOLE_HOME"
+rm -Rf "$GUACAMOLE_HOME"/*
 
 #
 # Create and define Guacamole lib and extensions directories
@@ -361,8 +361,9 @@ END
 fi
 
 # Update config file
-set_property "guacd-hostname" "$GUACD_PORT_4822_TCP_ADDR"
-set_property "guacd-port"     "$GUACD_PORT_4822_TCP_PORT"
+set_property "guacd-hostname"     "$GUACD_PORT_4822_TCP_ADDR"
+set_property "guacd-port"         "$GUACD_PORT_4822_TCP_PORT"
+set_optional_property "guacd-ssl" "$GUACD_SSL"
 
 #
 # Track which authentication backends are installed
