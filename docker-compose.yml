@@ -1,0 +1,33 @@
+version: '2'
+services:
+  mysql:
+    image: mysql
+    # Persistent data of mysql
+    volumes:
+      - /data/gaucamole/database:/var/lib/mysql
+    container_name: "mysql"
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=guacamole_db
+      - MYSQL_USER=guacamole_user
+      - MYSQL_PASSWORD=123456
+  guacd:
+    image: glyptodon/guacd
+    container_name: "guacd"
+  guacamole:
+    image: glyptodon/guacamole
+    container_name: guacamole
+    environment:
+      - MYSQL_HOSTNAME=mysql
+      - MYSQL_DATABASE=guacamole_db
+      - MYSQL_USER=guacamole_user
+      - MYSQL_PASSWORD=123456
+      # Specify host name of guacd and port of guacd
+      - GUACD_PORT_4822_TCP_ADDR=guacd
+      - GUACD_PORT_4822_TCP_PORT=4822
+    ports:
+      - "8069:8080"
+    depends_on:
+      - mysql
+      - guacd
+~                
